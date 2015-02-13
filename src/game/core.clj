@@ -2,9 +2,9 @@
   (:gen-class))
 
 (defn profit [m e e' env]
-  (let [x (- e' e)
-        {:keys [capital]} env]
-    {:net-profit x :%-gain (/ x capital 1.0)}))
+  (let [{:keys [capital]} env
+        x (- e' capital)]
+    {:net-profit x :gain% (/ x capital 1.0)}))
 
 (defn max-drawdown [m e e' env]
   (when (< e' e)
