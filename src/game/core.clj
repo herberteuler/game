@@ -75,18 +75,23 @@
     (+ equity (* amount payoff))))
 
 (defn go [env]
-  (let [{:keys [bag capital equity alloc history measures]} env
+  (let [{:keys [bag capital equity alloc history measures turn]
+         :or {turn 0}} env
         equity' (draw bag capital equity alloc)]
     (assoc env
-      :equity equity' :history (conj history equity')
+      :turn (inc turn) :equity equity' :history (conj history equity')
       :measures (update-measures measures equity equity' env))))
 
 (defn run [& args]
   (let [{:keys [bag capital alloc trial]} args]
-    (first (drop trial
-                 (iterate go
-                          {:bag bag :capital capital :equity capital
-                           :alloc alloc :history [capital] :measures {}})))))
+    (loop [sq (iterate go
+                       {:bag bag :capital capital :equity capital
+                        :alloc alloc :history [capital] :measures{}})
+           k 0]
+      (let [[x & sq'] (seq sq)]
+        (if (or (>= k trial) (<= (:equity x) 0))
+          x
+          (recur sq' (inc k)))))))
 
 (def bag-1 (vec (concat
                  (repeat 50 -1)
