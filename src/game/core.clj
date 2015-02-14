@@ -54,7 +54,18 @@
 
 (def losing-streak (streak < :losing-streak :longest-losing-streak))
 
-(def measure-fns [profit max-drawdown winning-streak losing-streak])
+(defn equity [cmp eq eq%]
+  (fn [m e e' env]
+    (let [{:keys [capital]} env]
+      (when (cmp e' (get m eq capital))
+        {eq e' eq% (/ e' capital 0.01)}))))
+
+(def max-equity (equity > :max-equity :max-equity%))
+
+(def min-equity (equity < :min-equity :min-equity%))
+
+(def measure-fns [profit max-drawdown winning-streak losing-streak
+                  max-equity min-equity])
 
 (defn update-measures [measures e e' env]
   (reduce (fn [m f] (merge m (f m e e' env))) measures measure-fns))
