@@ -6,14 +6,43 @@
         x (- e' capital)]
     {:net-profit x :gain% (/ x capital 0.01)}))
 
+(defn drawdown [context value]
+  (let [{:keys [last-peak peak trough last-value]} context]
+    (cond (and (nil? peak) (nil? trough))
+          (if (or (nil? last-value) (>= value last-value))
+            [nil {:last-peak nil :peak value
+                  :trough nil :last-value value}]
+            [nil {:last-peak nil :peak last-value
+                  :trough value :last-value value}])
+
+          (< value last-value)
+          [nil (assoc context
+                 :trough (if (nil? trough) value (min trough value))
+                 :last-value value)]
+
+          (< value peak)
+          [nil (assoc context :last-value value)]
+
+          (nil? trough)
+          [nil (assoc context :peak value :last-value value)]
+
+          (or (nil? last-peak) (>= value last-peak))
+          [[peak trough]
+           {:last-peak peak :peak value :trough nil :last-value value}]
+
+          :otherwise
+          [nil (assoc context :peak value :last-value value)])))
+
 (defn max-drawdown [m e e' env]
-  (when (< e' e)
-    (let [x (- e' e)
-          {:keys [capital]} env
-          dd (/ x capital 1.0)
-          {:keys [max-drawdown] :or {max-drawdown 0}} m]
-      (when (< dd max-drawdown)
-        {:max-drawdown dd}))))
+  (let [{:keys [max-drawdown max-drawdown% drawdown-context]
+         :or {max-drawdown 0 max-drawdown% 0
+              drawndown-context {:last-value e}}} m
+        [[p t] ctx] (drawdown drawdown-context e')]
+    (merge {:drawdown-context ctx}
+           (when p
+             (let [d (- p t)]
+               (when (> d max-drawdown)
+                 {:max-drawdown d :max-drawdown% (/ d p 0.01)}))))))
 
 (defn streak [cmp stk max-stk]
   (fn [m e e' env]
