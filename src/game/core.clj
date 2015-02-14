@@ -59,12 +59,12 @@
 
 (defn alloc-fix-amount [n]
   (fn [capital equity]
-    n))
+    (* n 1.0)))
 
 (defn alloc-fix-capital-percent [n]
   (fn [capital equity]
-    (/ capital n)))
+    (/ capital n 1.0)))
 
 (defn alloc-fix-equity-percent [n]
   (fn [capital equity]
-    (/ equity n)))
+    (/ equity n 1.0)))
