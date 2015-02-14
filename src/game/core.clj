@@ -4,7 +4,7 @@
 (defn profit [m e e' env]
   (let [{:keys [capital]} env
         x (- e' capital)]
-    {:net-profit x :gain% (/ x capital 1.0)}))
+    {:net-profit x :gain% (/ x capital 0.01)}))
 
 (defn max-drawdown [m e e' env]
   (when (< e' e)
