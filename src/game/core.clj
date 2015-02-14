@@ -58,8 +58,9 @@
                  (repeat 3 20))))
 
 (defn alloc-fix-amount [n]
-  (fn [capital equity]
-    (* n 1.0)))
+  (let [n' (* n 1.0)]
+    (fn [capital equity]
+      n')))
 
 (defn alloc-fix-capital-percent [n]
   (fn [capital equity]
