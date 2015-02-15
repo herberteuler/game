@@ -1,5 +1,7 @@
 (ns game.core
-  (:gen-class))
+  (:import [javafx.application Application Platform]
+           [javafx.stage Stage])
+  (:gen-class :extends javafx.application.Application))
 
 (defn profit [m e e' env]
   (let [{:keys [capital]} env
@@ -69,7 +71,7 @@
 
 (defn update-measures [measures e e' env]
   (reduce (fn [m f] (merge m (f m e e' env))) measures measure-fns))
-
+
 (defn draw [bag capital equity alloc]
   (let [amount (alloc capital equity), payoff (rand-nth bag)]
     (+ equity (* amount payoff))))
@@ -92,7 +94,7 @@
         (if (or (>= k trial) (<= (:equity x) 0))
           x
           (recur sq' (inc k)))))))
-
+
 (def bag-1 (vec (concat
                  (repeat 50 -1)
                  (repeat 10 -2)
@@ -114,3 +116,17 @@
 (defn alloc-fix-equity-percent [n]
   (fn [capital equity]
     (/ equity n 1.0)))
+
+(def ^Stage primary-stage)
+
+(defn -start [this ^Stage stage]
+  (alter-var-root #'primary-stage (constantly stage)))
+
+(defn start-app []
+  (future
+    (let [args (make-array String 0)]
+      (Platform/setImplicitExit false)
+      (Application/launch game.core args))))
+
+(defn stop-app []
+  (Platform/exit))
