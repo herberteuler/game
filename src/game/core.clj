@@ -46,11 +46,11 @@
                (when (> d max-drawdown)
                  {:max-drawdown d :max-drawdown% (/ d p 0.01)}))))))
 
-(defn streak [cmp stk max-stk]
+(defn streak [cmp stk longest-stk]
   (fn [m e e' env]
     (if (cmp e' e)
       {stk (inc (get m stk 0))}
-      {stk 0 max-stk (max (get m stk 0) (get m max-stk 0))})))
+      {stk 0 longest-stk (max (get m stk 0) (get m longest-stk 0))})))
 
 (def winning-streak (streak > :winning-streak :longest-winning-streak))
 
